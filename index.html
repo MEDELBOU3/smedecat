@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPro - Advanced Learning Platform</title>
+    <script src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .search-bar {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .search-bar button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('HERO_IMAGE_URL');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #e67e22;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .feature {
+            flex-basis: 30%;
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .categories {
+            margin-top: 50px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-card i {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .courses {
+            margin-top: 50px;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .course-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .course-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .course-info {
+            padding: 20px;
+        }
+
+        .course-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .course-instructor {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .course-rating {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .course-price {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .testimonials {
+            margin-top: 50px;
+            background-color: white;
+            padding: 50px 0;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+        }
+
+        .instructors {
+            margin-top: 50px;
+        }
+
+        .instructor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .instructor-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .instructor-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .instructor-info {
+            padding: 20px;
+        }
+
+        .instructor-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .instructor-title {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .newsletter {
+            margin-top: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .newsletter h2 {
+            margin-bottom: 20px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .newsletter-form input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        .newsletter-form button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .learning-paths {
+            margin-top: 50px;
+        }
+
+        .path-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .path-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .path-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .path-description {
+            margin-bottom: 20px;
+        }
+
+        .path-courses {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .path-courses li {
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            margin-top: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 50px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .student-projects {
+            margin-top: 50px;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .project-info {
+            padding: 20px;
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .project-student {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .faq {
+            margin-top: 50px;
+        }
+
+        .faq-item {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .faq-answer {
+            display: none;
+        }
+
+        .faq-answer.show {
+            display: block;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex-basis: calc(25% - 20px);
+            margin-bottom: 20px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 5px;
+        }
+
+        .footer-section ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-icon {
+                display: block;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+            .footer-section {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const App = () => {
+            const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+            const [activeFaq, setActiveFaq] = React.useState(null);
+
+            const toggleMobileMenu = () => {
+                setMobileMenuOpen(!mobileMenuOpen);
+            };
+
+            const toggleFaq = (index) => {
+                setActiveFaq(activeFaq === index ? null : index);
+            };
+
+            return (
+                <div>
+                    <header>
+                        <nav className="container">
+                            <div className="logo">EduPro</div>
+                            <div className={`nav-links ${mobileMenuOpen ? 'show' : ''}`}>
+                                <a href="#"><i className="fas fa-home"></i> Home</a>
+                                <a href="#"><i className="fas fa-book"></i> Courses</a>
+                                <a href="#"><i className="fas fa-user"></i> My Learning</a>
+                                <a href="dashbord.html"><i className="fas fa-tachometer-alt"></i> dashboard </a>
+                                <a href="#"><i className="fas fa-sign-in-alt"></i> Login</a>
+                            </div>
+                            <div className="mobile-menu-icon" onClick={toggleMobileMenu}>
+                                <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+                            </div>
+                        </nav>
+                        <div className="container">
+                            <div className="search-bar">
+                                <input type="text" placeholder="Search for courses..." />
+                                <button><i className="fas fa-search"></i> Search</button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main>
+                        <section className="hero">
+                            <div className="container">
+                                <h1>Learn Without Limits</h1>
+                                <p>Start, switch, or advance your career with over 5,000 courses</p>
+                                <button className="cta-button">Get Started</button>
+                            </div>
+                        </section>
+
+                        <section className="container features">
+                            <div className="feature">
+                                <i className="fas fa-laptop"></i>
+                                <h2>Learn Anywhere</h2>
+                                <p>Access courses on any device, anytime</p>
+                            </div>
+                            <div className="feature">
+                                <i className="fas fa-certificate"></i>
+                                <h2>Earn Certificates</h2>
+                                <p>Get recognized for your achievements</p>
+                            </div>
+                            <div className="feature">
+                                <i className="fas fa-users"></i>
+                                <h2>Expert Instructors</h2>
+                                <p>Learn from industry professionals</p>
+                            </div>
+                        </section>
+
+                        <section className="container categories">
+                            <h2>Top Categories</h2>
+                            <div className="category-grid">
+                                {['Development', 'Business', 'IT & Software', 'Design', 'Marketing', 'Personal Development'].map((category, index) => (
+                                    <div key={index} className="category-card">
+                                        <i className={`fas fa-${['code', 'chart-line', 'server', 'paint-brush', 'bullhorn', 'brain'][index]}`}></i>
+                                        <h3>{category}</h3>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="container courses">
+                            <h2>Top Courses</h2>
+                            <div className="course-grid">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div key={i} className="course-card">
+                                        <div className="course-image" style={{backgroundImage: `url('COURSE_IMAGE_URL_${i}')`}}></div>
+                                        <div className="course-info">
+                                            <div className="course-title">Course Title {i}</div>
+                                            <div className="course-instructor">Instructor Name</div>
+                                            <div className="course-rating">
+                                                <i className="fas fa-star"></i>
+                                                <i className="fas fa-star"></i>
+                                                <i className="fas fa-star"></i>
+                                                <i className="fas fa-star"></i>
+                                                <i className="fas fa-star-half-alt"></i>
+                                                4.5 (1,234 ratings)
+                                            </div>
+                                            <div className="course-price">$49.99</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="testimonials">
+                            <div className="container">
+                                <h2>What Our Students Say</h2>
+                                <div className="testimonial-grid">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="testimonial-card">
+                                            <div className="testimonial-text">
+                                                "EduPro has transformed my career. The courses are top-notch and the instructors are amazing!"
+                                            </div>
+                                            <div className="testimonial-author">
+                                                - John Doe, Software Developer
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="container instructors">
+                            <h2>Meet Our Top Instructors</h2>
+                            <div className="instructor-grid">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div key={i} className="instructor-card">
+                                        <div className="instructor-image" style={{backgroundImage: `url('INSTRUCTOR_IMAGE_URL_${i}')`}}></div>
+                                        <div className="instructor-info">
+                                            <div className="instructor-name">Instructor Name {i}</div>
+                                            <div className="instructor-title">Expert in Subject {i}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="container learning-paths">
+                            <h2>Learning Paths</h2>
+                            <div className="path-grid">
+                                {['Web Development', 'Data Science', 'Digital Marketing'].map((path, index) => (
+                                    <div key={index} className="path-card">
+                                        <h3 className="path-title">{path}</h3>
+                                        <p className="path-description">Master {path} with our curated course sequence.</p>
+                                        <ul className="path-courses">
+                                            <li>Course 1</li>
+                                            <li>Course 2</li>
+                                            <li>Course 3</li>
+                                        </ul>
+                                        <button className="cta-button">Start Learning Path</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="stats">
+                            <div className="container">
+                                <div className="stats-grid">
+                                    <div className="stat-item">
+                                        <h3>1M+</h3>
+                                        <p>Students</p>
+                                    </div>
+                                    <div className="stat-item">
+                                        <h3>5000+</h3>
+                                        <p>Courses</p>
+                                    </div>
+                                    <div className="stat-item">
+                                        <h3>100+</h3>
+                                        <p>Countries</p>
+                                    </div>
+                                    <div className="stat-item">
+                                        <h3>500+</h3>
+                                        <p>Instructors</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="container student-projects">
+                            <h2>Student Projects</h2>
+                            <div className="project-grid">
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="project-card">
+                                        <div className="project-image" style={{backgroundImage: `url('PROJECT_IMAGE_URL_${i}')`}}></div>
+                                        <div className="project-info">
+                                            <div className="project-title">Project Title {i}</div>
+                                            <div className="project-student">By Student Name</div>
+                                            <p>A brief description of the student project goes here.</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="container faq">
+                            <h2>Frequently Asked Questions</h2>
+                            {[
+                                { question: "How do I enroll in a course?", answer: "To enroll in a course, simply navigate to the course page and click the 'Enroll Now' button." },
+                                { question: "Can I access courses on mobile devices?", answer: "Yes, our platform is fully responsive and works on all devices including smartphones and tablets." },
+                                { question: "What payment methods do you accept?", answer: "We accept all major credit cards, PayPal, and bank transfers for course payments." },
+                            ].map((faq, index) => (
+                                <div key={index} className="faq-item">
+                                    <div className="faq-question" onClick={() => toggleFaq(index)}>
+                                        {faq.question}
+                                        <i className={`fas fa-chevron-${activeFaq === index ? 'up' : 'down'}`}></i>
+                                    </div>
+                                    <div className={`faq-answer ${activeFaq === index ? 'show' : ''}`}>
+                                        {faq.answer}
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+
+                        <section className="newsletter">
+                            <div className="container">
+                                <h2>Subscribe to Our Newsletter</h2>
+                                <p>Get the latest courses and special offers delivered to your inbox</p>
+                                <form className="newsletter-form">
+                                    <input type="email" placeholder="Enter your email" required />
+                                    <button type="submit">Subscribe</button>
+                                </form>
+                            </div>
+                        </section>
+                    </main>
+
+                    <footer>
+                        <div className="container">
+                            <div className="footer-content">
+                                <div className="footer-section">
+                                    <h3>About EduPro</h3>
+                                    <p>EduPro is a leading online learning platform offering high-quality courses from top instructors worldwide.</p>
+                                </div>
+                                <div className="footer-section">
+                                    <h3>Quick Links</h3>
+                                    <ul>
+                                        <li><a href="#">Home</a></li>
+                                        <li><a href="#">Courses</a></li>
+                                        <li><a href="#">Instructors</a></li>
+                                        <li><a href="#">About Us</a></li>
+                                        <li><a href="#">Contact</a></li>
+                                    </ul>
+                                </div>
+                                <div className="footer-section">
+                                    <h3>Support</h3>
+                                    <ul>
+                                        <li><a href="#">FAQ</a></li>
+                                        <li><a href="#">Help Center</a></li>
+                                        <li><a href="#">Terms of Service</a></li>
+                                        <li><a href="#">Privacy Policy</a></li>
+                                    </ul>
+                                </div>
+                                <div className="footer-section">
+                                    <h3>Connect With Us</h3>
+                                    <div className="social-icons">
+                                        <a href="#"><i className="fab fa-facebook"></i></a>
+                                        <a href="#"><i className="fab fa-twitter"></i></a>
+                                        <a href="#"><i className="fab fa-linkedin"></i></a>
+                                        <a href="#"><i className="fab fa-instagram"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>&copy; 2024 EduPro. All rights reserved.</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

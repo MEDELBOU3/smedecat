@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Student-Driven Educational Dashboard with Dark/Light Mode</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Light mode colors */
+            --primary-color-light: #3498db;
+            --secondary-color-light: #2c3e50;
+            --accent-color-light: #e74c3c;
+            --background-color-light: #f0f2f5;
+            --text-color-light: #333;
+            --card-bg-light: #ffffff;
+            --hover-color-light: #e9ecef;
+
+            /* Dark mode colors */
+            --primary-color-dark: #2980b9;
+            --secondary-color-dark: #34495e;
+            --accent-color-dark: #c0392b;
+            --background-color-dark: #1a1a2e;
+            --text-color-dark: #ffffff;
+            --card-bg-dark: #16213e;
+            --hover-color-dark: #0f3460;
+
+            /* Default to light mode */
+            --primary-color: var(--primary-color-light);
+            --secondary-color: var(--secondary-color-light);
+            --accent-color: var(--accent-color-light);
+            --background-color: var(--background-color-light);
+            --text-color: var(--text-color-light);
+            --card-bg: var(--card-bg-light);
+            --hover-color: var(--hover-color-light);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            height: 100vh;
+        }
+        .sidebar {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .main-content {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .user-profile {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        .nav-menu {
+            list-style-type: none;
+            padding: 0;
+        }
+        .nav-menu li {
+            margin-bottom: 10px;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .nav-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .widget {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .course-card {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .progress-bar {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background-color: #2ecc71;
+            height: 100%;
+            border-radius: 10px;
+            width: 0;
+            transition: width 0.5s ease-in-out;
+        }
+        .assignments-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .assignments-list li {
+            background-color: var(--card-bg);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .assignments-list li:hover {
+            background-color: var(--hover-color);
+        }
+        .performance-chart {
+            height: 300px;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar-day {
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .calendar-day.today {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .calendar-day.has-event {
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .close-button {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, textarea, select {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: var(--accent-color);
+        }
+        .goals-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .goals-list li {
+            background-color: var(--card-bg);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function ThemeToggle({ isDarkMode, onToggle }) {
+            return (
+                <div className="theme-toggle">
+                    <label className="switch">
+                        <input type="checkbox" checked={isDarkMode} onChange={onToggle} />
+                        <span className="slider"></span>
+                    </label>
+                </div>
+            );
+        }
+
+        function UserProfile({ user, onEdit }) {
+            return (
+                <div className="user-profile">
+                    <div className="user-avatar" onClick={onEdit}>{user.name[0]}</div>
+                    <h3>{user.name}</h3>
+                    <p>{user.email}</p>
+                    <p>Student ID: {user.studentId}</p>
+                </div>
+            );
+        }
+
+        function Sidebar({ user, onEditProfile }) {
+            return (
+                <div className="sidebar">
+                    <UserProfile user={user} onEdit={onEditProfile} />
+                    <ul className="nav-menu">
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#courses">Courses</a></li>
+                        <li><a href="#assignments">Assignments</a></li>
+                        <li><a href="#performance">Performance</a></li>
+                        <li><a href="#calendar">Calendar</a></li>
+                        <li><a href="#goals">Goals</a></li>
+                        <li><a href="#settings">Settings</a></li>
+                    </ul>
+                </div>
+            );
+        }
+
+        function CourseCard({ title, progress, onClick, onEdit }) {
+            useEffect(() => {
+                const fill = document.getElementById(`progress-${title}`);
+                fill.style.width = `${progress}%`;
+            }, [progress]);
+
+            return (
+                <div className="course-card" onClick={onClick}>
+                    <h3>{title}</h3>
+                    <div className="progress-bar">
+                        <div id={`progress-${title}`} className="progress-bar-fill"></div>
+                    </div>
+                    <p>{progress}% Complete</p>
+                    <button onClick={(e) => { e.stopPropagation(); onEdit(); }}>Update Progress</button>
+                </div>
+            );
+        }
+
+        function CoursesWidget({ courses, onAddCourse, onUpdateProgress }) {
+            const [selectedCourse, setSelectedCourse] = useState(null);
+
+            return (
+                <div className="widget">
+                    <h2>My Courses</h2>
+                    <button onClick={onAddCourse}>Add New Course</button>
+                    <div className="courses-grid">
+                        {courses.map(course => (
+                            <CourseCard 
+                                key={course.title} 
+                                title={course.title} 
+                                progress={course.progress} 
+                                onClick={() => setSelectedCourse(course)}
+                                onEdit={() => onUpdateProgress(course)}
+                            />
+                        ))}
+                    </div>
+                    {selectedCourse && (
+                        <Modal onClose={() => setSelectedCourse(null)}>
+                            <h2>{selectedCourse.title}</h2>
+                            <p>Progress: {selectedCourse.progress}%</p>
+                            <p>This is where you'd display more detailed information about the course, such as upcoming lessons, recent grades, etc.</p>
+                        </Modal>
+                    )}
+                </div>
+            );
+        }
+
+        function AssignmentsWidget({ assignments, onAddAssignment, onUpdateAssignment }) {
+            return (
+                <div className="widget">
+                    <h2>Assignments</h2>
+                    <button onClick={onAddAssignment}>Add New Assignment</button>
+                    <ul className="assignments-list">
+                        {assignments.map(assignment => (
+                            <li key={assignment.title}>
+                                <div>
+                                    <strong>{assignment.title}</strong>
+                                    <p>Due: {assignment.due}</p>
+                                </div>
+                                <select 
+                                    value={assignment.status} 
+                                    onChange={(e) => onUpdateAssignment({...assignment, status: e.target.value})}
+                                >
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        }
+
+        function PerformanceWidget({ grades }) {
+            useEffect(() => {
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: grades.map(grade => grade.date),
+                        datasets: [{
+                            label: 'GPA',
+                            data: grades.map(grade => grade.gpa),
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 4
+                            }
+                        }
+                    }
+                });
+            }, [grades]);
+
+            return (
+                <div className="widget">
+                    <h2>Academic Performance</h2>
+                    <div className="performance-chart">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            );
+        }
+
+        function CalendarWidget({ events, onAddEvent }) {
+            const [selectedDate, setSelectedDate] = useState(null);
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = new Date().getDate();
+
+            return (
+                <div className="widget">
+                    <h2>Calendar</h2>
+                    <button onClick={onAddEvent}>Add New Event</button>
+                    <div className="calendar">
+                        {days.map(day => <div key={day}>{day}</div>)}
+                        {[...Array(31)].map((_, i) => (
+                            <div 
+                                key={i} 
+                                className={`calendar-day ${i + 1 === today ? 'today' : ''} ${events[i + 1] ? 'has-event' : ''}`}
+                                onClick={() => events[i + 1] && setSelectedDate(i + 1)}
+                            >
+                                {i + 1}
+                            </div>
+                        ))}
+                    </div>
+                    {selectedDate && (
+                        <Modal onClose={() => setSelectedDate(null)}>
+                            <h2>Events on {selectedDate}</h2>
+                            <p>{events[selectedDate]}</p>
+                        </Modal>
+                    )}
+                </div>
+            );
+        }
+
+        function GoalsWidget({ goals, onAddGoal, onUpdateGoal }) {
+            return (
+                <div className="widget">
+                    <h2>My Goals</h2>
+                    <button onClick={onAddGoal}>Add New Goal</button>
+                    <ul className="goals-list">
+                        {goals.map(goal => (
+                            <li key={goal.id}>
+                                <div>
+                                    <strong>{goal.title}</strong>
+                                    <p>Target Date: {goal.targetDate}</p>
+                                </div>
+                                <select 
+                                    value={goal.status} 
+                                    onChange={(e) => onUpdateGoal({...goal, status: e.target.value})}
+                                >
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        }
+
+        function Modal({ children, onClose }) {
+            return (
+                <div className="modal">
+                    <div className="modal-content">
+                        <button className="close-button" onClick={onClose}>&times;</button>
+                        {children}
+                    </div>
+                </div>
+            );
+        }
+
+        function Dashboard() {
+            const [user, setUser] = useState({
+                name: "John Doe",
+                email: "john.doe@example.com",
+                studentId: "12345"
+            });
+            const [courses, setCourses] = useState([
+                { title: "Mathematics", progress: 75 },
+                { title: "Science", progress: 60 },
+                { title: "History", progress: 40 },
+                { title: "Literature", progress: 90 },
+            ]);
+            const [assignments, setAssignments] = useState([
+                { title: "Math Homework", due: "Tomorrow", status: "Not Started" },
+                { title: "Science Project", due: "Next Week", status: "In Progress" },
+                { title: "History Essay", due: "In 3 days", status: "Completed" },
+            ]);
+            const [grades, setGrades] = useState([
+                { date: 'Jan', gpa: 3.2 },
+                { date: 'Feb', gpa: 3.4 },
+                { date: 'Mar', gpa: 3.3 },
+                { date: 'Apr', gpa: 3.5 },
+                { date: 'May', gpa: 3.6 },
+                { date: 'Jun', gpa: 3.8 },
+            ]);
+            const [events, setEvents] = useState({
+                5: "Math Quiz",
+                12: "Science Project Due",
+                20: "History Presentation"
+            });
+            const [goals, setGoals] = useState([
+                { id: 1, title: "Improve GPA", targetDate: "End of Semester", status: "In Progress" },
+                { id: 2, title: "Complete Online Course", targetDate: "August 31", status: "Not Started" },
+            ]);
+            const [showModal, setShowModal] = useState(null);
+            const [isDarkMode, setIsDarkMode] = useState(false);
+
+            useEffect(() => {
+                document.body.className = isDarkMode ? 'dark-mode' : 'light-mode';
+                const root = document.documentElement;
+                if (isDarkMode) {
+                    root.style.setProperty('--primary-color', 'var(--primary-color-dark)');
+                    root.style.setProperty('--secondary-color', 'var(--secondary-color-dark)');
+                    root.style.setProperty('--accent-color', 'var(--accent-color-dark)');
+                    root.style.setProperty('--background-color', 'var(--background-color-dark)');
+                    root.style.setProperty('--text-color', 'var(--text-color-dark)');
+                    root.style.setProperty('--card-bg', 'var(--card-bg-dark)');
+                    root.style.setProperty('--hover-color', 'var(--hover-color-dark)');
+                } else {
+                    root.style.setProperty('--primary-color', 'var(--primary-color-light)');
+                    root.style.setProperty('--secondary-color', 'var(--secondary-color-light)');
+                    root.style.setProperty('--accent-color', 'var(--accent-color-light)');
+                    root.style.setProperty('--background-color', 'var(--background-color-light)');
+                    root.style.setProperty('--text-color', 'var(--text-color-light)');
+                    root.style.setProperty('--card-bg', 'var(--card-bg-light)');
+                    root.style.setProperty('--hover-color', 'var(--hover-color-light)');
+                }
+            }, [isDarkMode]);
+
+            const handleEditProfile = () => {
+                setShowModal(
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        setUser({
+                            name: e.target.name.value,
+                            email: e.target.email.value,
+                            studentId: e.target.studentId.value
+                        });
+                        setShowModal(null);
+                    }}>
+                        <input name="name" defaultValue={user.name} placeholder="Name" required />
+                        <input name="email" defaultValue={user.email} placeholder="Email" required type="email" />
+                        <input name="studentId" defaultValue={user.studentId} placeholder="Student ID" required />
+                        <button type="submit">Save Changes</button>
+                    </form>
+                );
+            };
+
+            const handleAddCourse = () => {
+                setShowModal(
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        setCourses([...courses, { title: e.target.title.value, progress: 0 }]);
+                        setShowModal(null);
+                    }}>
+                        <input name="title" placeholder="Course Title" required />
+                        <button type="submit">Add Course</button>
+                    </form>
+                );
+            };
+
+            const handleUpdateProgress = (course) => {
+                setShowModal(
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        const updatedCourses = courses.map(c => 
+                            c.title === course.title ? {...c, progress: Number(e.target.progress.value)} : c
+                        );
+                        setCourses(updatedCourses);
+                        setShowModal(null);
+                    }}>
+                        <input name="progress" type="number" min="0" max="100" defaultValue={course.progress} required />
+                        <button type="submit">Update Progress</button>
+                    </form>
+                );
+            };
+
+            const handleAddAssignment = () => {
+                setShowModal(
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        setAssignments([...assignments, {
+                            title: e.target.title.value,
+                            due: e.target.due.value,
+                            status: "Not Started"
+                        }]);
+                        setShowModal(null);
+                    }}>
+                        <input name="title" placeholder="Assignment Title" required />
+                        <input name="due" placeholder="Due Date" required />
+                        <button type="submit">Add Assignment</button>
+                    </form>
+                );
+            };
+
+            const handleUpdateAssignment = (updatedAssignment) => {
+                const updatedAssignments = assignments.map(assignment => 
+                    assignment.title === updatedAssignment.title ? updatedAssignment : assignment
+                );
+                setAssignments(updatedAssignments);
+            };
+
+            const handleAddEvent = () => {
+                setShowModal(
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        setEvents({...events, [e.target.date.value]: e.target.title.value});
+                        setShowModal(null);
+                    }}>
+                        <input name="date" type="number" min="1" max="31" placeholder="Date" required />
+                        <input name="title" placeholder="Event Title" required />
+                        <button type="submit">Add Event</button>
+                    </form>
+                );
+            };
+
+            const handleAddGoal = () => {
+                setShowModal(
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        setGoals([...goals, {
+                            id: goals.length + 1,
+                            title: e.target.title.value,
+                            targetDate: e.target.targetDate.value,
+                            status: "Not Started"
+                        }]);
+                        setShowModal(null);
+                    }}>
+                        <input name="title" placeholder="Goal Title" required />
+                        <input name="targetDate" placeholder="Target Date" required />
+                        <button type="submit">Add Goal</button>
+                    </form>
+                );
+            };
+
+            const handleUpdateGoal = (updatedGoal) => {
+                const updatedGoals = goals.map(goal => 
+                    goal.id === updatedGoal.id ? updatedGoal : goal
+                );
+                setGoals(updatedGoals);
+            };
+
+            return (
+                <div className="dashboard">
+                    <ThemeToggle isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
+                    <Sidebar user={user} onEditProfile={handleEditProfile} />
+                    <div className="main-content">
+                        <h1>Welcome back, {user.name}!</h1>
+                        <CoursesWidget 
+                            courses={courses} 
+                            onAddCourse={handleAddCourse}
+                            onUpdateProgress={handleUpdateProgress}
+                        />
+                        <AssignmentsWidget 
+                            assignments={assignments}
+                            onAddAssignment={handleAddAssignment}
+                            onUpdateAssignment={handleUpdateAssignment}
+                        />
+                        <PerformanceWidget grades={grades} />
+                        <CalendarWidget events={events} onAddEvent={handleAddEvent} />
+                        <GoalsWidget 
+                            goals={goals}
+                            onAddGoal={handleAddGoal}
+                            onUpdateGoal={handleUpdateGoal}
+                        />
+                    </div>
+                    {showModal && <Modal onClose={() => setShowModal(null)}>{showModal}</Modal>}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
